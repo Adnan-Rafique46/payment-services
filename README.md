@@ -1,29 +1,42 @@
 # README #
 
-This README would normally document whatever steps are necessary to get your application up and running.
+## Steps to setup webhook in Stripe ##
+We are writing the steps for setting up service endpoint deployed on localhost, you just
+ need to replace ngrok URL with actual server URL when going to production
 
-### What is this repository for? ###
+### Download and start ngrok ###
+* Download and install ngrok https://ngrok.com
+* Start ngrok using the command ./ngrok http 8080, you can change the port as needed
+* Note down secure URL provided by ngrok
 
-* Quick summary
-* Version
-* [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
+### Steps to setup webhook in Stripe ###
 
-### How do I get set up? ###
+* Login to stripe dashboard https://dashboard.stripe.com
+* Open Developers>Webhooks menu
+* Click on Add endpoint against the option "Endpoints receiving events from your account"
+* Enter endpoint URL, copied from previous step by appending /payment-service/stripe-events e;g https://cb5a17f34c0e.ngrok.io/payment-service/stripe-events
+* Select the events you are interested from "Event to send" dropdown
+we have provided implementation for the following events so far
+  * payment_method.attached
+   * payment_intent.succeeded
+   * customer.created
+   * checkout.session.completed
 
-* Summary of set up
-* Configuration
-* Dependencies
-* Database configuration
-* How to run tests
-* Deployment instructions
+### Run payment service application ###
+First Update the property service.url with ngrok or prod server endpoint in application-*.properties file, * based on application profile
+e;g service.url=https://cb5a17f34c0e.ngrok.io
 
-### Contribution guidelines ###
+Run payment service "PaymentServicesApiWebApplication", by default this SpringBoot application will run on port 8080, since we had
+started ngrok to listen to port 8080, that will forward traffic to our application on port 8080.
 
-* Writing tests
-* Code review
-* Other guidelines
 
-### Who do I talk to? ###
+### Testing the webhook locally ###
+Install and run stripe cli, following the instrusctions in following page
+https://stripe.com/docs/webhooks/test
 
-* Repo owner or admin
-* Other community or team contact
+* Install Stripe
+* run command, stripe login
+* Forward events to your server
+  * stripe listen --forward-to https://3fd7c5b45605.ngrok.io/payment-service/stripe-events
+  * above command will start listening to further commands
+  * for excample run command in another window: stripe trigger payment_intent.succeeded 

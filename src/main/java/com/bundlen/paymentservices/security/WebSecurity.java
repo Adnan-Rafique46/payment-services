@@ -14,7 +14,7 @@ import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 
 import static com.bundlen.paymentservices.constant.StringConstants.SWAGGER_URLS;
 import static java.util.Optional.ofNullable;
-import static org.springframework.http.HttpMethod.GET;
+import static org.springframework.http.HttpMethod.*;
 
 @Configuration
 @EnableWebSecurity
@@ -26,8 +26,12 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
 
     @Override
     public void configure(HttpSecurity http) throws Exception {
-        http.authorizeRequests()
+        http.csrf().disable().authorizeRequests()
                 .antMatchers(GET, ofNullable(SWAGGER_URLS).orElse("").split(",")).permitAll()
+                .antMatchers(GET, "/assets/*").permitAll()
+                .antMatchers(GET, "/index.html").permitAll()
+                .antMatchers(GET, "/payment-service/checkout/*").permitAll()
+                .antMatchers(POST, "/payment-service/stripe-events").permitAll()
                 .anyRequest().authenticated()
                 .and().oauth2ResourceServer()
                 .jwt();

@@ -16,4 +16,8 @@ public class CustomerDTO {
     private String id;
     private String stripeCustomerId;
     private String organizationId;
+    private String stripeIntentId;
+    private String stripePaymentMethod;
+    private Date checkoutDate;
+    private Date nextPaymentDate;
 }

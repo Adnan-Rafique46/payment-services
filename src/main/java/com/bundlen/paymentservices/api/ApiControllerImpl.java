@@ -13,14 +13,11 @@ import com.stripe.exception.StripeException;
 import com.stripe.model.*;
 import com.stripe.model.checkout.Session;
 import com.stripe.net.ApiResource;
-import com.stripe.param.checkout.SessionCreateParams;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import spark.Request;
-import spark.Response;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -77,6 +74,21 @@ public class ApiControllerImpl implements ApiController {
 
         // Handle the event
         switch (event.getType()) {
+            case "checkout.session.completed":
+                Session checkoutSession = (Session) stripeObject;
+                String setupIntentId = checkoutSession.getSetupIntent();
+                System.out.println("Setup Intent Id: "+setupIntentId);
+                try {
+                    SetupIntent intent = SetupIntent.retrieve(setupIntentId);
+                    String stripeCustomerId = checkoutSession.getCustomer();
+                    String organizationId = checkoutSession.getMetadata().get("org_id");
+                    String stripePaymentMethod = intent.getPaymentMethod();
+                    paymentService.updateCustomerIntent(CustomerDTO.builder().organizationId(organizationId).stripeCustomerId(stripeCustomerId)
+                            .stripeIntentId(intent.getId()).stripePaymentMethod(stripePaymentMethod).build());
+                } catch (StripeException e) {
+                    e.printStackTrace();
+                }
+                break;
             case "payment_intent.succeeded":
                 PaymentIntent paymentIntent = (PaymentIntent) stripeObject;
                 System.out.println("Payment Intent for customer: "+paymentIntent.getCustomer());

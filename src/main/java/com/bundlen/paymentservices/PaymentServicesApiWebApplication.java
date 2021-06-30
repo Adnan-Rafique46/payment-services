@@ -16,13 +16,13 @@ import org.springframework.core.env.Environment;
 public class PaymentServicesApiWebApplication extends SpringBootServletInitializer {
 
 
-	//*
+
 	public static void main(String[] args) {
 		ApplicationContext context = SpringApplication.run(PaymentServicesApiWebApplication.class, args);
 		Environment environment = context.getEnvironment();
 		Stripe.apiKey = environment.getRequiredProperty("stripe.secret-key");
 	}
-
+   //
 	@Bean
 	public OpenAPI getOpenAPI() {
 		return new OpenAPI()

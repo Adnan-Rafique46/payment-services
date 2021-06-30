@@ -22,7 +22,7 @@ public class PaymentServicesApiWebApplication extends SpringBootServletInitializ
 		Environment environment = context.getEnvironment();
 		Stripe.apiKey = environment.getRequiredProperty("stripe.secret-key");
 	}
-   //
+
 	@Bean
 	public OpenAPI getOpenAPI() {
 		return new OpenAPI()
